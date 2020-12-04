@@ -45,3 +45,8 @@ Content-Type: application/json
     "limit": 5, // the amount of jokes requested
     "page": 1
 }
+
+###
+
+// get jokes data with query param of limit and page from db
+GET http://localhost:3000/jokes/paginate?limit=100&page=14
