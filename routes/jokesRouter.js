@@ -80,6 +80,23 @@ router.get('/', async (req, res) => {
   }
 })
 
+// get random jokes from database storage
+router.post('/all', async (req, res) => {
+  const num = req.body.num
+  const offsetData = req.body.offset
+  try {
+    await Jokes.paginate({}, { offset: offsetData, limit: num })
+      .then(result => {
+        res.status(200).json({ message: 'SUCCESS', data: result })
+      })
+      .catch(error => {
+        console.log('ini error ', error)
+      })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+})
+
 // remove joke from database storage using its id
 router.delete('/:id', getJoke, async (req, res) => {
   try {

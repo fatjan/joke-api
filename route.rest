@@ -35,3 +35,13 @@ GET http://localhost:3000/jokes/many/4
 
 // delete all stored jokes from db storage
 DELETE  http://localhost:3000/jokes/all
+
+###
+// get 5 jokes data with body param from db
+POST http://localhost:3000/jokes/all
+Content-Type: application/json
+
+{
+    "num": 5, // the amount of jokes requested
+    "offset": 4
+}
