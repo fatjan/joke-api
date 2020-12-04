@@ -64,7 +64,8 @@ router.post('/', async (req, res) => {
     })
   }
   res.status(200).json({
-    data: jokesObtained
+    data: jokesObtained,
+    message: 'SUCCESS'
   })
 })
 
@@ -155,27 +156,26 @@ async function getJoke(req, res, next) {
   next()
 }
 
-let allJokes = []
-
 // delete all data from db
-router.delete('/all', getAllJokes, async (req, res) => {
-  // getAllJokes().then(async () => {
-  //   try {
-  //     const jokes = allJokes
-  //     const count = jokes.length
-  //     for (let i = 0; i < count; i++) {
-  //       const jokeID = jokes[i]._id
-  //       const joke = await Jokes.findById(jokeID)
-  //       await joke.remove()
-  //       // await joke.remove()
-  //     }
-  //     res.status(200).json({ message: 'SUCCESS' })
-  //   } catch (error) {
-  //     res.status(500).json({ message: error.message })
-  //   }
-  // })
+router.get('/delete-all', getAllJokes, async (req, res) => {
   const jokes = res.allJokes
-  console.log('ini all jokes ', jokes)
+  const amount = jokes.length
+  let j = 0
+  // const ids = []
+  // jokes.forEach((joke) => {
+  //   ids =
+  // })
+  for (let i = 0; i < amount; i++) {
+    try {
+      await jokes[i].remove()
+    } catch (error) {
+      res.status(500).json({ message: error })
+    }
+    j += 1
+  }
+  if (j === amount - 1) {
+    res.status(200).json({ message: 'SUCCESS DELETE ALL' })
+  }
 })
 
 async function getAllJokes(req, res, next) {
