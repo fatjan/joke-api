@@ -159,22 +159,17 @@ async function getJoke(req, res, next) {
 // delete all data from db
 router.get('/delete-all', getAllJokes, async (req, res) => {
   const jokes = res.allJokes
-  const amount = jokes.length
-  let j = 0
-  // const ids = []
-  // jokes.forEach((joke) => {
-  //   ids =
-  // })
-  for (let i = 0; i < amount; i++) {
-    try {
-      await jokes[i].remove()
-    } catch (error) {
-      res.status(500).json({ message: error })
-    }
-    j += 1
-  }
-  if (j === amount - 1) {
+  // gather all ids from getAll data
+  const ids = []
+  jokes.forEach((joke) => {
+    ids.push(joke._id)
+  })
+  // then use deleteMany to delete all data from storage
+  try {
+    await Jokes.deleteMany({ _id: { $in: ids } })
     res.status(200).json({ message: 'SUCCESS DELETE ALL' })
+  } catch (error) {
+    res.status(400).json({ message: error })
   }
 })
 
