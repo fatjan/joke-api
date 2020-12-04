@@ -22,7 +22,7 @@ GET http://localhost:3000/jokes
 ###
 
 // delete joke by its id
-DELETE  http://localhost:3000/jokes/5fc7d0a30f398c611775753b
+DELETE  http://localhost:3000/jokes/5fc9e2730641fa2ce656a2a6
 
 
 ###
