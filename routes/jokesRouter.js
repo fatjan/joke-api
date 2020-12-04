@@ -5,21 +5,21 @@ const Jokes = require('../models/jokesModels')
 
 const basicAPI = 'http://api.icndb.com/jokes/random/'
 
-// let obtainedJoke
+let obtainedJoke
 
-// for (let i = 0; i < 10; i++) {
-//   getRandomJoke().then(() => {
-//     storeRandomJoke(obtainedJoke)
-//   })
-// }
+for (let i = 0; i < 10; i++) {
+  getRandomJoke().then(() => {
+    storeRandomJoke(obtainedJoke)
+  })
+}
 
 // fetch random joke data from API
-// async function getRandomJoke(res) {
-//   await axios.get(basicAPI)
-//     .then((response) => {
-//       obtainedJoke = response.data.value.joke
-//     })
-// }
+async function getRandomJoke(res) {
+  await axios.get(basicAPI)
+    .then((response) => {
+      obtainedJoke = response.data.value.joke
+    })
+}
 
 // store random joke data from API to db storage
 async function storeRandomJoke(jokeData) {
@@ -27,7 +27,11 @@ async function storeRandomJoke(jokeData) {
     const joke = new Jokes({
       joke: jokeData
     })
-    await joke.save()
+    const jokeStored = Jokes.find({ 'joke': joke.joke })
+    // only save data that is unique (not exist in db yet)
+    if (jokeStored != null) {
+      await joke.save()
+    }
   } catch (error) {
     console.log('This is error ', error)
   }
@@ -67,13 +71,6 @@ router.get('/', async (req, res) => {
   try {
     const jokes = await Jokes.find()
     const countJokes = jokes.length
-    await Jokes.paginate({}, { offset: 3, limit: 2 })
-      .then(result => {
-        console.log('ini result ', result)
-      })
-      .catch(error => {
-        console.log('ini error ', error)
-      })
     res.status(200).json({ message: 'SUCCESS', count: countJokes, data: jokes })
   } catch (error) {
     res.status(500).json({ message: error.message })
@@ -149,12 +146,10 @@ router.delete('/all', (req, res) => {
     try {
       const jokes = allJokes
       const count = jokes.length
-      console.log('ini jokes awal ', jokes[0])
       for (let i = 0; i < count; i++) {
         const jokeID = jokes[i]._id
         const joke = await Jokes.findById(jokeID)
         await joke.remove()
-        console.log('ini si joke ', joke)
         // await joke.remove()
       }
       res.status(200).json({ message: 'SUCCESS' })
