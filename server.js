@@ -6,4 +6,10 @@ mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true, useUnifiedTo
 const db = mongoose.connection
 db.on('error', (error) => console.error(error))
 db.once('open', () => console.log('Connected to Database'))
+
+app.use(express.json())
+
+const jokesRouter = require('./routes/jokesRouter')
+app.use('/jokes', jokesRouter)
+
 app.listen(3000, () => console.log('Server Started'))
