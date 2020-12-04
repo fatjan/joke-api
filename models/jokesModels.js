@@ -14,11 +14,4 @@ const jokeDataSchema = new mongoose.Schema({
 
 jokeDataSchema.plugin(mongoosePaginate)
 
-// const Joke = mongoose.model('Joke', jokeDataSchema)
-
-// Joke.paginate(query, options)
-//   .then(result => {})
-//   .catch(error => {})
-
-module.exports = mongoose.model('Jokes', jokeDataSchema)
 module.exports = mongoose.model('Jokes', jokeDataSchema)

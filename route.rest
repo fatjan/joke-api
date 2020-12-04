@@ -5,12 +5,12 @@ Content-Type:
 
 ###
 
-// create a new joke to the db
+// fetch and create new jokes to the db
 POST http://localhost:3000/jokes
 Content-Type: application/json
 
 {
-    "joke": "This is another new joke, ok."
+    "amount": 10
 }
 
 
@@ -22,26 +22,28 @@ GET http://localhost:3000/jokes
 ###
 
 // delete joke by its id
-DELETE  http://localhost:3000/jokes/5fc9e2730641fa2ce656a2a6
+DELETE  http://localhost:3000/jokes/5fc9e4c33314952ea5028af7
 
 
 ###
 
-// get many random jokes data from db
-GET http://localhost:3000/jokes/many/4
+// get 5 random jokes data from db
+GET http://localhost:3000/jokes/many/5
 
 
 ###
 
 // delete all stored jokes from db storage
-DELETE  http://localhost:3000/jokes/all
+GET  http://localhost:3000/jokes/delete-all
+
 
 ###
-// get 5 jokes data with body param from db
-POST http://localhost:3000/jokes/all
-Content-Type: application/json
 
-{
-    "num": 5, // the amount of jokes requested
-    "offset": 4
-}
+// get jokes data with query param of limit and page from db
+GET http://localhost:3000/jokes/paginate?limit=2&page=1
+
+
+###
+
+// get 10 analysis of random jokes data from db
+GET http://localhost:3000/jokes/analysis/10

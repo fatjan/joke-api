@@ -2,6 +2,7 @@ const express = require('express')
 const axios = require('axios')
 const router = express.Router()
 const Jokes = require('../models/jokesModels')
+const paginate = require('express-paginate')
 
 const basicAPI = 'http://api.icndb.com/jokes/random/'
 
@@ -27,7 +28,7 @@ async function storeRandomJoke(jokeData) {
     const joke = new Jokes({
       joke: jokeData
     })
-    const jokeStored = Jokes.find({ 'joke': joke.joke })
+    const jokeStored = Jokes.find({ joke: joke.joke })
     // only save data that is unique (not exist in db yet)
     if (jokeStored != null) {
       await joke.save()
@@ -52,18 +53,21 @@ router.get('/from-api', async (req, res) => {
   }
 })
 
-// API to create new joke and save it to db storage
+// API to fetch new joke and save it to db storage
 router.post('/', async (req, res) => {
-  const joke = new Jokes({
-    joke: req.body.joke
-  })
-  try {
-    const newJokeCreated = await joke.save()
-    // 201 means sucessfully created
-    res.status(201).json({ message: 'SUCCESS', data: newJokeCreated })
-  } catch (error) {
-    res.status(400).json({ message: error.message })
+  const amountRequest = req.body.amount
+  const jokesObtained = []
+  for (let i = 0; i < amountRequest; i++) {
+    await getRandomJoke().then(() => {
+      storeRandomJoke(obtainedJoke)
+      jokesObtained.push(obtainedJoke)
+    })
   }
+  res.status(200).json({
+    data: jokesObtained,
+    message: 'SUCCESS',
+    count: jokesObtained.length
+  })
 })
 
 // get random jokes from database storage
@@ -79,18 +83,31 @@ router.get('/', async (req, res) => {
 
 // get random jokes from database storage
 router.post('/all', async (req, res) => {
-  const num = req.body.num
-  const offsetData = req.body.offset
+  // const num = parseInt(req.body.num)
+  // const offsetData = parseInt(req.body.offset)
   try {
-    await Jokes.paginate({}, { offset: offsetData, limit: num })
-      .then(result => {
-        res.status(200).json({ message: 'SUCCESS', data: result })
+    const [results, itemCount] = await Promise.all([
+      Jokes.find({}).limit(req.body.limit).skip(req.skip).lean().exec(),
+      Jokes.count({})
+    ])
+    const pageCount = Math.ceil(itemCount / req.body.limit)
+    if (req.accepts('json')) {
+      // inspired by Stripe's API response for list objects
+      res.json({
+        object: 'list',
+        has_more: paginate.hasNextPages(req)(pageCount),
+        data: results
       })
-      .catch(error => {
-        console.log('ini error ', error)
+    } else {
+      res.render('jokes', {
+        jokes: results,
+        pageCount,
+        itemCount,
+        pages: paginate.getArrayPages(req)(3, pageCount, req.body.page)
       })
-  } catch (error) {
-    res.status(500).json({ message: error.message })
+    }
+  } catch (err) {
+    res.status(400).send(err)
   }
 })
 
@@ -109,10 +126,11 @@ router.get('/many/:num', getAllJokes, async (req, res) => {
   try {
     const obtainedJokes = res.allJokes
     const number = parseInt(req.params.num)
+    const jokesAmount = obtainedJokes.length
     const newJokes = []
     // const jokesLength = obtainedJokes.length
     for (let i = 0; i < number; i++) {
-      const randomNum = Math.floor(Math.random() * number)
+      const randomNum = Math.floor(Math.random() * jokesAmount)
       newJokes.push(obtainedJokes[randomNum])
     }
     const count = newJokes.length
@@ -122,6 +140,7 @@ router.get('/many/:num', getAllJokes, async (req, res) => {
   }
 })
 
+// getJoke to get a joke by its id
 async function getJoke(req, res, next) {
   let joke
   try {
@@ -138,35 +157,93 @@ async function getJoke(req, res, next) {
   next()
 }
 
-let allJokes = []
-
 // delete all data from db
-router.delete('/all', (req, res) => {
-  getAllJokes().then(async () => {
-    try {
-      const jokes = allJokes
-      const count = jokes.length
-      for (let i = 0; i < count; i++) {
-        const jokeID = jokes[i]._id
-        const joke = await Jokes.findById(jokeID)
-        await joke.remove()
-        // await joke.remove()
-      }
-      res.status(200).json({ message: 'SUCCESS' })
-    } catch (error) {
-      res.status(500).json({ message: error.message })
-    }
+router.get('/delete-all', getAllJokes, async (req, res) => {
+  const jokes = res.allJokes
+  // gather all ids from getAll data
+  const ids = []
+  jokes.forEach((joke) => {
+    ids.push(joke._id)
   })
+  // then use deleteMany to delete all data from storage
+  try {
+    await Jokes.deleteMany({ _id: { $in: ids } })
+    res.status(200).json({ message: 'SUCCESS DELETE ALL' })
+  } catch (error) {
+    res.status(400).json({ message: error })
+  }
 })
 
-async function getAllJokes(req, res) {
+async function getAllJokes(req, res, next) {
   let jokes = []
   try {
-    jokes = await Jokes.find().toArray()
+    jokes = await Jokes.find()
   } catch (error) {
     console.log('Error get all jokes ', error)
   }
-  allJokes = jokes
+  res.allJokes = jokes
+  next()
+}
+
+// get 10 random jokes from database storage
+router.get('/analysis/:num', getAllJokes, async (req, res) => {
+  try {
+    const obtainedJokes = res.allJokes
+    const number = parseInt(req.params.num)
+    const jokesAmount = obtainedJokes.length
+    const newJokes = []
+    // const jokesLength = obtainedJokes.length
+    for (let i = 0; i < number; i++) {
+      const randomNum = Math.floor(Math.random() * jokesAmount)
+      newJokes.push(obtainedJokes[randomNum])
+    }
+    const words = {}
+    const jokesList = []
+    newJokes.forEach((item) => {
+      const jokeItem = item.joke
+      jokesList.push(jokeItem)
+      const jokeWords = jokeItem.split(' ')
+      jokeWords.forEach((word) => {
+        const cleanedWord = cleanWord(word)
+        if (cleanWord !== '-' && cleanWord !== '#') {
+          if (!(cleanedWord in words)) {
+            words[cleanedWord] = 1
+          } else {
+            words[cleanedWord] += 1
+          }
+        }
+      })
+    })
+    const result = {
+      jokes: jokesList,
+      words: words
+    }
+    res.status(200).json(result)
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+})
+
+const cleanWord = (word) => {
+  let altered = word.replace('.', '')
+  altered = altered.replace(',', '')
+  altered = altered.replace(')', '')
+  let occ = altered.split('&quot').length - 1
+  for (let i = 0; i < occ; i++) {
+    altered = altered.replace('&quot', '')
+  }
+  occ = altered.split(';').length - 1
+  for (let i = 0; i < occ; i++) {
+    altered = altered.replace(';', '')
+  }
+  altered = altered.replace('--', '')
+  for (let i = 0; i < 2; i++) {
+    if (altered[0] === "'" || altered[altered.length - 1] === "'") {
+      altered = altered.replace("'", '')
+    }
+  }
+  altered = altered.replace('?', '')
+  return altered
 }
 
 module.exports = router
