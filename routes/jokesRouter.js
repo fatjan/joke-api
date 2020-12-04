@@ -33,10 +33,32 @@ router.post('/', async (req, res) => {
   }
 })
 // get random jokes from database storage
-
+router.get('/', async (req, res) => {
+  try {
+    const jokes = await Jokes.find()
+    res.status(200).json({ message: 'SUCCESS', data: jokes })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+})
 // remove all jokes from database storage
 
 // get 10 random jokes from database storage
 
-module.exports = router
+async function getJoke(req, res, next) {
+  let joke
+  try {
+    joke = await Jokes.findById(req.params.id)
+    if (joke == null) {
+      // 404 means cannot find anything
+      return res.status(404).json({ message: 'Cannot find the joke data.' })
+    }
+  } catch (error) {
+    return res.status(500).json({ message: error.message })
+  }
 
+  res.joke = joke
+  next()
+}
+
+module.exports = router

@@ -1,10 +1,17 @@
+// get random joke from other API
 GET http://localhost:3000/jokes/from-api
 Content-Type: 
 
 ###
+
+// create a new joke to the db
 POST http://localhost:3000/jokes
 Content-Type: application/json
 
 {
     "joke": "A study showed the leading causes of death in the United States are: 1. Heart disease, 2. Chuck Norris, 3. Cancer"
 }
+
+###
+// get all jokes data from db
+GET http://localhost:3000/jokes
