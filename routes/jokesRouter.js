@@ -205,10 +205,12 @@ router.get('/analysis/:num', getAllJokes, async (req, res) => {
       const jokeWords = jokeItem.split(' ')
       jokeWords.forEach((word) => {
         const cleanedWord = cleanWord(word)
-        if (!(cleanedWord in words)) {
-          words[cleanedWord] = 1
-        } else {
-          words[cleanedWord] += 1
+        if (cleanWord !== '-' && cleanWord !== '#') {
+          if (!(cleanedWord in words)) {
+            words[cleanedWord] = 1
+          } else {
+            words[cleanedWord] += 1
+          }
         }
       })
     })
@@ -225,11 +227,21 @@ router.get('/analysis/:num', getAllJokes, async (req, res) => {
 const cleanWord = (word) => {
   let altered = word.replace('.', '')
   altered = altered.replace(',', '')
-  altered = altered.replace(';', '')
   altered = altered.replace(')', '')
-  altered = altered.replace('&quot', '')
+  let occ = altered.split('&quot').length - 1
+  for (let i = 0; i < occ; i++) {
+    altered = altered.replace('&quot', '')
+  }
+  occ = altered.split(';').length - 1
+  for (let i = 0; i < occ; i++) {
+    altered = altered.replace(';', '')
+  }
   altered = altered.replace('--', '')
-  altered = altered.replace("'", '')
+  for (let i = 0; i < 2; i++) {
+    if (altered[0] === "'" || altered[altered.length - 1] === "'") {
+      altered = altered.replace("'", '')
+    }
+  }
   altered = altered.replace('?', '')
   return altered
 }
