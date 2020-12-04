@@ -227,10 +227,10 @@ const cleanWord = (word) => {
   altered = altered.replace(',', '')
   altered = altered.replace(';', '')
   altered = altered.replace(')', '')
-  altered = altered.replace('(', '')
   altered = altered.replace('&quot', '')
   altered = altered.replace('--', '')
   altered = altered.replace("'", '')
+  altered = altered.replace('?', '')
   return altered
 }
 
