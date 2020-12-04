@@ -33,7 +33,7 @@ async function storeRandomJoke(jokeData) {
   }
 }
 
-// get random jokes from other api
+// API to get random jokes from other api
 router.get('/from-api', async (req, res) => {
   try {
     await axios.get(basicAPI)
@@ -47,7 +47,8 @@ router.get('/from-api', async (req, res) => {
     res.status(500).json({ message: error.message })
   }
 })
-// create new unique joke and save it to db storage
+
+// API to create new joke and save it to db storage
 router.post('/', async (req, res) => {
   const joke = new Jokes({
     joke: req.body.joke
@@ -60,6 +61,7 @@ router.post('/', async (req, res) => {
     res.status(400).json({ message: error.message })
   }
 })
+
 // get random jokes from database storage
 router.get('/', async (req, res) => {
   try {
@@ -69,8 +71,8 @@ router.get('/', async (req, res) => {
     res.status(500).json({ message: error.message })
   }
 })
-// remove joke from database storage
-// Deleting one
+
+// remove joke from database storage using its id
 router.delete('/:id', getJoke, async (req, res) => {
   try {
     await res.joke.remove()
@@ -81,6 +83,25 @@ router.delete('/:id', getJoke, async (req, res) => {
 })
 
 // get 10 random jokes from database storage
+router.get('/many/:num', getAllJokes, async (req, res) => {
+  try {
+    const obtainedJokes = res.allJokes
+    const number = parseInt(req.params.num)
+    console.log('ini number ', number)
+    console.log('ini obtainedJokes ', obtainedJokes)
+    const newJokes = []
+    const jokesLength = obtainedJokes.length
+    for (let i = 0; i < number; i++) {
+      const randomNum = Math.floor(Math.random() * jokesLength)
+      newJokes.push(obtainedJokes[randomNum])
+    }
+    const count = newJokes.length
+    res.status(200).json({ message: 'SUCCESS', count: count, data: newJokes })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+})
+
 
 async function getJoke(req, res, next) {
   let joke
@@ -95,6 +116,18 @@ async function getJoke(req, res, next) {
   }
 
   res.joke = joke
+  next()
+}
+
+async function getAllJokes(req, res, next) {
+  let allJokes = []
+  try {
+    allJokes = await Jokes.find()
+  } catch (error) {
+    console.log('Error get all jokes ', error)
+  }
+
+  res.allJokes = allJokes
   next()
 }
 

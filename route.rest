@@ -20,3 +20,7 @@ GET http://localhost:3000/jokes
 
 // delete joke by its id
 DELETE  http://localhost:3000/jokes/5fc7d0a30f398c611775753b
+
+###
+// get many random jokes data from db
+GET http://localhost:3000/jokes/many/3
