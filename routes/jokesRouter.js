@@ -79,12 +79,13 @@ router.get('/', async (req, res) => {
 
 // get random jokes from database storage
 router.post('/all', async (req, res) => {
-  const num = req.body.num
-  const offsetData = req.body.offset
+  const num = parseInt(req.body.num)
+  const offsetData = parseInt(req.body.offset)
   try {
     await Jokes.paginate({}, { offset: offsetData, limit: num })
       .then(result => {
-        res.status(200).json({ message: 'SUCCESS', data: result })
+        console.log('ini data ', result)
+        // res.status(200).json({ message: 'SUCCESS', data: result })
       })
       .catch(error => {
         console.log('ini error ', error)
@@ -159,14 +160,15 @@ router.delete('/all', (req, res) => {
   })
 })
 
-async function getAllJokes(req, res) {
+async function getAllJokes(req, res, next) {
   let jokes = []
   try {
-    jokes = await Jokes.find().toArray()
+    jokes = await Jokes.find()
   } catch (error) {
     console.log('Error get all jokes ', error)
   }
-  allJokes = jokes
+  res.allJokes = jokes
+  next()
 }
 
 module.exports = router

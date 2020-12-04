@@ -28,7 +28,7 @@ DELETE  http://localhost:3000/jokes/5fc9e2730641fa2ce656a2a6
 ###
 
 // get many random jokes data from db
-GET http://localhost:3000/jokes/many/4
+GET http://localhost:3000/jokes/many/5
 
 
 ###
@@ -43,5 +43,5 @@ Content-Type: application/json
 
 {
     "num": 5, // the amount of jokes requested
-    "offset": 4
+    "offset": 10
 }
