@@ -5,12 +5,12 @@ Content-Type:
 
 ###
 
-// create a new joke to the db
+// fetch and create new jokes to the db
 POST http://localhost:3000/jokes
 Content-Type: application/json
 
 {
-    "joke": "This is another chuck norris joke, ok."
+    "amount": 10
 }
 
 
@@ -55,4 +55,4 @@ GET http://localhost:3000/jokes/paginate?limit=100&page=14
 ###
 
 // get analysis of random jokes data from db
-GET http://localhost:3000/jokes/analysis/5
+GET http://localhost:3000/jokes/analysis/10

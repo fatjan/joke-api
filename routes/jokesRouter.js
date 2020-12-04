@@ -28,7 +28,7 @@ async function storeRandomJoke(jokeData) {
     const joke = new Jokes({
       joke: jokeData
     })
-    const jokeStored = Jokes.find({ 'joke': joke.joke })
+    const jokeStored = Jokes.find({ joke: joke.joke })
     // only save data that is unique (not exist in db yet)
     if (jokeStored != null) {
       await joke.save()
@@ -55,16 +55,17 @@ router.get('/from-api', async (req, res) => {
 
 // API to create new joke and save it to db storage
 router.post('/', async (req, res) => {
-  const joke = new Jokes({
-    joke: req.body.joke
-  })
-  try {
-    const newJokeCreated = await joke.save()
-    // 201 means sucessfully created
-    res.status(201).json({ message: 'SUCCESS', data: newJokeCreated })
-  } catch (error) {
-    res.status(400).json({ message: error.message })
+  const amountRequest = req.body.amount
+  const jokesObtained = []
+  for (let i = 0; i < amountRequest; i++) {
+    await getRandomJoke().then(() => {
+      storeRandomJoke(obtainedJoke)
+      jokesObtained.push(obtainedJoke)
+    })
   }
+  res.status(200).json({
+    data: jokesObtained
+  })
 })
 
 // get random jokes from database storage
@@ -201,19 +202,21 @@ router.get('/analysis/:num', getAllJokes, async (req, res) => {
       newJokes.push(obtainedJokes[randomNum])
     }
     const words = {}
+    const jokesList = []
     newJokes.forEach((item) => {
       const jokeItem = item.joke
+      jokesList.push(jokeItem)
       const jokeWords = jokeItem.split(' ')
       jokeWords.forEach((word) => {
         if (!(word in words)) {
-          words.word = 1
+          words[word] = 1
         } else {
-          words.word += 1
+          words[word] += 1
         }
       })
     })
     const result = {
-      jokes: newJokes,
+      jokes: jokesList,
       words: words
     }
     res.status(200).json(result)
