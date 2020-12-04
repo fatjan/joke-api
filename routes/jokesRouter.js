@@ -53,7 +53,7 @@ router.get('/from-api', async (req, res) => {
   }
 })
 
-// API to create new joke and save it to db storage
+// API to fetch new joke and save it to db storage
 router.post('/', async (req, res) => {
   const amountRequest = req.body.amount
   const jokesObtained = []
@@ -65,7 +65,8 @@ router.post('/', async (req, res) => {
   }
   res.status(200).json({
     data: jokesObtained,
-    message: 'SUCCESS'
+    message: 'SUCCESS',
+    count: jokesObtained.length
   })
 })
 
@@ -203,10 +204,11 @@ router.get('/analysis/:num', getAllJokes, async (req, res) => {
       jokesList.push(jokeItem)
       const jokeWords = jokeItem.split(' ')
       jokeWords.forEach((word) => {
-        if (!(word in words)) {
-          words[word] = 1
+        const cleanedWord = cleanWord(word)
+        if (!(cleanedWord in words)) {
+          words[cleanedWord] = 1
         } else {
-          words[word] += 1
+          words[cleanedWord] += 1
         }
       })
     })
@@ -219,5 +221,17 @@ router.get('/analysis/:num', getAllJokes, async (req, res) => {
     res.status(500).json({ message: error.message })
   }
 })
+
+const cleanWord = (word) => {
+  let altered = word.replace('.', '')
+  altered = altered.replace(',', '')
+  altered = altered.replace(';', '')
+  altered = altered.replace(')', '')
+  altered = altered.replace('(', '')
+  altered = altered.replace('&quot', '')
+  altered = altered.replace('--', '')
+  altered = altered.replace("'", '')
+  return altered
+}
 
 module.exports = router
