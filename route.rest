@@ -10,7 +10,7 @@ POST http://localhost:3000/jokes
 Content-Type: application/json
 
 {
-    "joke": "This is another new joke, ok."
+    "joke": "This is another chuck norris joke, ok."
 }
 
 
@@ -22,7 +22,7 @@ GET http://localhost:3000/jokes
 ###
 
 // delete joke by its id
-DELETE  http://localhost:3000/jokes/5fc9e2730641fa2ce656a2a6
+DELETE  http://localhost:3000/jokes/5fc9e4c33314952ea5028af7
 
 
 ###

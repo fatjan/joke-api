@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-// const mongoosePaginate = require('mongoose-paginate-v2')
+const mongoosePaginate = require('mongoose-paginate-v2')
 
 const jokeDataSchema = new mongoose.Schema({
   joke: {
@@ -12,7 +12,7 @@ const jokeDataSchema = new mongoose.Schema({
   }
 })
 
-// jokeDataSchema.plugin(mongoosePaginate)
+jokeDataSchema.plugin(mongoosePaginate)
 
 // const Joke = mongoose.model('Joke', jokeDataSchema)
 

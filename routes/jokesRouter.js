@@ -110,10 +110,11 @@ router.get('/many/:num', getAllJokes, async (req, res) => {
   try {
     const obtainedJokes = res.allJokes
     const number = parseInt(req.params.num)
+    const jokesAmount = obtainedJokes.length
     const newJokes = []
     // const jokesLength = obtainedJokes.length
     for (let i = 0; i < number; i++) {
-      const randomNum = Math.floor(Math.random() * number)
+      const randomNum = Math.floor(Math.random() * jokesAmount)
       newJokes.push(obtainedJokes[randomNum])
     }
     const count = newJokes.length
@@ -123,6 +124,7 @@ router.get('/many/:num', getAllJokes, async (req, res) => {
   }
 })
 
+// getJoke to get a joke by its id
 async function getJoke(req, res, next) {
   let joke
   try {
@@ -142,22 +144,24 @@ async function getJoke(req, res, next) {
 let allJokes = []
 
 // delete all data from db
-router.delete('/all', (req, res) => {
-  getAllJokes().then(async () => {
-    try {
-      const jokes = allJokes
-      const count = jokes.length
-      for (let i = 0; i < count; i++) {
-        const jokeID = jokes[i]._id
-        const joke = await Jokes.findById(jokeID)
-        await joke.remove()
-        // await joke.remove()
-      }
-      res.status(200).json({ message: 'SUCCESS' })
-    } catch (error) {
-      res.status(500).json({ message: error.message })
-    }
-  })
+router.delete('/all', getAllJokes, async (req, res) => {
+  // getAllJokes().then(async () => {
+  //   try {
+  //     const jokes = allJokes
+  //     const count = jokes.length
+  //     for (let i = 0; i < count; i++) {
+  //       const jokeID = jokes[i]._id
+  //       const joke = await Jokes.findById(jokeID)
+  //       await joke.remove()
+  //       // await joke.remove()
+  //     }
+  //     res.status(200).json({ message: 'SUCCESS' })
+  //   } catch (error) {
+  //     res.status(500).json({ message: error.message })
+  //   }
+  // })
+  const jokes = res.allJokes
+  console.log('ini all jokes ', jokes)
 })
 
 async function getAllJokes(req, res, next) {
