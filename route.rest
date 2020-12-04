@@ -45,5 +45,5 @@ GET http://localhost:3000/jokes/paginate?limit=2&page=1
 
 ###
 
-// get analysis of random jokes data from db
-GET http://localhost:3000/jokes/analysis/290
+// get 10 analysis of random jokes data from db
+GET http://localhost:3000/jokes/analysis/10
