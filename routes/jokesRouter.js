@@ -2,6 +2,7 @@ const express = require('express')
 const axios = require('axios')
 const router = express.Router()
 const Jokes = require('../models/jokesModels')
+const paginate = require('express-paginate')
 
 const basicAPI = 'http://api.icndb.com/jokes/random/'
 
@@ -79,19 +80,31 @@ router.get('/', async (req, res) => {
 
 // get random jokes from database storage
 router.post('/all', async (req, res) => {
-  const num = parseInt(req.body.num)
-  const offsetData = parseInt(req.body.offset)
+  // const num = parseInt(req.body.num)
+  // const offsetData = parseInt(req.body.offset)
   try {
-    await Jokes.paginate({}, { offset: offsetData, limit: num })
-      .then(result => {
-        console.log('ini data ', result)
-        // res.status(200).json({ message: 'SUCCESS', data: result })
+    const [results, itemCount] = await Promise.all([
+      Jokes.find({}).limit(req.body.limit).skip(req.skip).lean().exec(),
+      Jokes.count({})
+    ])
+    const pageCount = Math.ceil(itemCount / req.body.limit)
+    if (req.accepts('json')) {
+      // inspired by Stripe's API response for list objects
+      res.json({
+        object: 'list',
+        has_more: paginate.hasNextPages(req)(pageCount),
+        data: results
       })
-      .catch(error => {
-        console.log('ini error ', error)
+    } else {
+      res.render('jokes', {
+        jokes: results,
+        pageCount,
+        itemCount,
+        pages: paginate.getArrayPages(req)(3, pageCount, req.body.page)
       })
-  } catch (error) {
-    res.status(500).json({ message: error.message })
+    }
+  } catch (err) {
+    res.status(400).send(err)
   }
 })
 

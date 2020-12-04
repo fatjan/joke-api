@@ -42,6 +42,6 @@ POST http://localhost:3000/jokes/all
 Content-Type: application/json
 
 {
-    "num": 5, // the amount of jokes requested
-    "offset": 10
+    "limit": 5, // the amount of jokes requested
+    "page": 1
 }
