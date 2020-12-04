@@ -27,7 +27,7 @@ router.post('/', async (req, res) => {
   try {
     const newJokeCreated = await joke.save()
     // 201 means sucessfully created
-    res.status(201).json(newJokeCreated)
+    res.status(201).json({ message: 'SUCCESS', data: newJokeCreated })
   } catch (error) {
     res.status(400).json({ message: error.message })
   }
@@ -41,7 +41,16 @@ router.get('/', async (req, res) => {
     res.status(500).json({ message: error.message })
   }
 })
-// remove all jokes from database storage
+// remove joke from database storage
+// Deleting one
+router.delete('/:id', getJoke, async (req, res) => {
+  try {
+    await res.joke.remove()
+    res.status(200).json({ message: 'SUCCESS' })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+})
 
 // get 10 random jokes from database storage
 
