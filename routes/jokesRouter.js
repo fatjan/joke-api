@@ -5,6 +5,34 @@ const Jokes = require('../models/jokesModels')
 
 const basicAPI = 'http://api.icndb.com/jokes/random/'
 
+let obtainedJoke
+
+for (let i = 0; i < 10; i++) {
+  getRandomJoke().then(() => {
+    storeRandomJoke(obtainedJoke)
+  })
+}
+
+// fetch random joke data from API
+async function getRandomJoke(res) {
+  await axios.get(basicAPI)
+    .then((response) => {
+      obtainedJoke = response.data.value.joke
+    })
+}
+
+// store random joke data from API to db storage
+async function storeRandomJoke(jokeData) {
+  try {
+    const joke = new Jokes({
+      joke: jokeData
+    })
+    await joke.save()
+  } catch (error) {
+    console.log('This is error ', error)
+  }
+}
+
 // get random jokes from other api
 router.get('/from-api', async (req, res) => {
   try {
