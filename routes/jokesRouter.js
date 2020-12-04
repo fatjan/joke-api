@@ -188,4 +188,38 @@ async function getAllJokes(req, res, next) {
   next()
 }
 
+// get 10 random jokes from database storage
+router.get('/analysis/:num', getAllJokes, async (req, res) => {
+  try {
+    const obtainedJokes = res.allJokes
+    const number = parseInt(req.params.num)
+    const jokesAmount = obtainedJokes.length
+    const newJokes = []
+    // const jokesLength = obtainedJokes.length
+    for (let i = 0; i < number; i++) {
+      const randomNum = Math.floor(Math.random() * jokesAmount)
+      newJokes.push(obtainedJokes[randomNum])
+    }
+    const words = {}
+    newJokes.forEach((item) => {
+      const jokeItem = item.joke
+      const jokeWords = jokeItem.split(' ')
+      jokeWords.forEach((word) => {
+        if (!(word in words)) {
+          words.word = 1
+        } else {
+          words.word += 1
+        }
+      })
+    })
+    const result = {
+      jokes: newJokes,
+      words: words
+    }
+    res.status(200).json(result)
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+})
+
 module.exports = router

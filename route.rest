@@ -50,3 +50,9 @@ Content-Type: application/json
 
 // get jokes data with query param of limit and page from db
 GET http://localhost:3000/jokes/paginate?limit=100&page=14
+
+
+###
+
+// get analysis of random jokes data from db
+GET http://localhost:3000/jokes/analysis/5
