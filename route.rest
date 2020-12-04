@@ -2,6 +2,7 @@
 GET http://localhost:3000/jokes/from-api
 Content-Type: 
 
+
 ###
 
 // create a new joke to the db
@@ -12,15 +13,25 @@ Content-Type: application/json
     "joke": "This is another new joke, ok."
 }
 
+
 ###
 // get all jokes data from db
 GET http://localhost:3000/jokes
+
 
 ###
 
 // delete joke by its id
 DELETE  http://localhost:3000/jokes/5fc7d0a30f398c611775753b
 
+
 ###
+
 // get many random jokes data from db
-GET http://localhost:3000/jokes/many/3
+GET http://localhost:3000/jokes/many/4
+
+
+###
+
+// delete all stored jokes from db storage
+DELETE  http://localhost:3000/jokes/all

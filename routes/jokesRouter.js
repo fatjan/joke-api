@@ -5,21 +5,21 @@ const Jokes = require('../models/jokesModels')
 
 const basicAPI = 'http://api.icndb.com/jokes/random/'
 
-let obtainedJoke
+// let obtainedJoke
 
-for (let i = 0; i < 10; i++) {
-  getRandomJoke().then(() => {
-    storeRandomJoke(obtainedJoke)
-  })
-}
+// for (let i = 0; i < 10; i++) {
+//   getRandomJoke().then(() => {
+//     storeRandomJoke(obtainedJoke)
+//   })
+// }
 
 // fetch random joke data from API
-async function getRandomJoke(res) {
-  await axios.get(basicAPI)
-    .then((response) => {
-      obtainedJoke = response.data.value.joke
-    })
-}
+// async function getRandomJoke(res) {
+//   await axios.get(basicAPI)
+//     .then((response) => {
+//       obtainedJoke = response.data.value.joke
+//     })
+// }
 
 // store random joke data from API to db storage
 async function storeRandomJoke(jokeData) {
@@ -66,7 +66,8 @@ router.post('/', async (req, res) => {
 router.get('/', async (req, res) => {
   try {
     const jokes = await Jokes.find()
-    res.status(200).json({ message: 'SUCCESS', data: jokes })
+    const countJokes = jokes.length
+    res.status(200).json({ message: 'SUCCESS', count: countJokes, data: jokes })
   } catch (error) {
     res.status(500).json({ message: error.message })
   }
@@ -102,7 +103,6 @@ router.get('/many/:num', getAllJokes, async (req, res) => {
   }
 })
 
-
 async function getJoke(req, res, next) {
   let joke
   try {
@@ -126,9 +126,23 @@ async function getAllJokes(req, res, next) {
   } catch (error) {
     console.log('Error get all jokes ', error)
   }
-
   res.allJokes = allJokes
   next()
 }
+
+// delete all data from db
+router.delete('/all', getAllJokes, async (req, res) => {
+  try {
+    const jokes = res.allJokes
+    const count = jokes.length
+    for (let i = 0; i < count; i++) {
+      const jokeID = jokes[i].id
+      const joke = await Jokes.findById(jokeID)
+      await joke.remove()
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+})
 
 module.exports = router
