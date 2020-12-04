@@ -1,0 +1,27 @@
+{
+  "name": "joke-api",
+  "version": "1.0.0",
+  "description": "API to get joke data ",
+  "main": "index.js",
+  "scripts": {
+    "devStart": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fatjan/joke-api.git"
+  },
+  "author": "fatjan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fatjan/joke-api/issues"
+  },
+  "homepage": "https://github.com/fatjan/joke-api#readme",
+  "devDependencies": {
+    "dotenv": "^8.2.0",
+    "nodemon": "^2.0.6"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^5.11.3"
+  }
+}
